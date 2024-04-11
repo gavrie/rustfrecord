@@ -3,48 +3,69 @@ use std::{collections::HashMap, fs, io::Read, path::Path};
 use anyhow::{Context, Result};
 use flate2::read::GzDecoder;
 use tch::Tensor;
-use tfrecord::{ExampleIter, Feature, FeatureKind, RecordReaderConfig};
+use tfrecord::{Example, ExampleIter, Feature, FeatureKind, RecordReaderConfig};
 
-pub fn tfrecord_reader(filename: &str, compressed: bool) -> Result<HashMap<String, Tensor>> {
-    let path = Path::new(filename);
+pub struct Reader {
+    // example_iter: ExampleIter<Box<dyn Read>>,
+    example_iter: ExampleIter<GzDecoder<fs::File>>,
+}
 
-    let conf = RecordReaderConfig {
-        check_integrity: false,
-    };
+impl Reader {
+    pub fn new(filename: &str, compressed: bool) -> Result<Self> {
+        let path = Path::new(filename);
 
-    let example_iter = fs::File::open(path)
-        .with_context(|| format!("failed to open {path:?}"))
-        .map(|r| -> Box<dyn Read> {
-            if compressed {
-                Box::new(GzDecoder::new(r))
-            } else {
-                Box::new(r)
-            }
-        })
-        .map(|r| ExampleIter::from_reader(r, conf))?;
+        let conf = RecordReaderConfig {
+            check_integrity: false,
+        };
 
+        let file = fs::File::open(path).with_context(|| format!("failed to open {path:?}"))?;
+
+        // FIXME: The Box is not Send so won't work with pyo3.
+        // We should probably use Arc instead or use statically typed (optional?) fields.
+        //
+        // let reader: Box<dyn Read> = if compressed {
+        //     Box::new(GzDecoder::new(file))
+        // } else {
+        //     Box::new(file)
+        // };
+
+        let reader = GzDecoder::new(file);
+
+        let example_iter = ExampleIter::from_reader(reader, conf);
+
+        Ok(Self { example_iter })
+    }
+}
+
+impl Iterator for Reader {
+    // Iterate over Examples.
+    //
     // Comment from example.proto:
     //
     // An Example is a mostly-normalized data format for storing data for training and inference.
     // It contains a key-value store (features); where each key (string) maps to a Feature message
     // (which is one of packed BytesList, FloatList, or Int64List).
-    //
-    for example in example_iter {
-        let hm = example?
-            .into_iter()
-            .map(|(name, feature)| {
-                let tensor = match feature.into_kinds() {
-                    Some(FeatureKind::F32(value)) => Tensor::from_slice(&value),
-                    Some(FeatureKind::I64(value)) => Tensor::from_slice(&value),
-                    Some(FeatureKind::Bytes(value)) => Tensor::from_slice2(&value),
-                    None => Tensor::new(),
-                };
-                (name, tensor)
-            })
-            .collect();
 
-        return Ok(hm); // FIXME
+    type Item = tfrecord::Result<HashMap<String, Tensor>>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.example_iter
+            .next()
+            .map(|e| e.map(|e| example_to_hashmap(e)))
     }
+}
 
-    unreachable!()
+fn example_to_hashmap(example: Example) -> HashMap<String, Tensor> {
+    example
+        .into_iter()
+        .map(|(name, feature)| {
+            let tensor = match feature.into_kinds() {
+                Some(FeatureKind::F32(value)) => Tensor::from_slice(&value),
+                Some(FeatureKind::I64(value)) => Tensor::from_slice(&value),
+                Some(FeatureKind::Bytes(value)) => Tensor::from_slice2(&value),
+                None => Tensor::new(),
+            };
+            (name, tensor)
+        })
+        .collect()
 }
