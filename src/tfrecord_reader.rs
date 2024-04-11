@@ -33,8 +33,6 @@ pub fn tfrecord_reader(filename: &str, compressed: bool) -> Result<HashMap<Strin
         let hm = example?
             .into_iter()
             .map(|(name, feature)| {
-                // println!("Feature: {name}"); //: {feature:?}");
-                // let tensor = Tensor::new();
                 let tensor = match feature.into_kinds() {
                     Some(FeatureKind::F32(value)) => Tensor::from_slice(&value),
                     Some(FeatureKind::I64(value)) => Tensor::from_slice(&value),
