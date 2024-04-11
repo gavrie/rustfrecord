@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use pyo3::exceptions::{PyTypeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3_tch::{wrap_tch_err, PyTensor};
+use tch::Tensor;
 
 mod pyo3_tch;
 mod tfrecord_reader;
@@ -18,16 +21,16 @@ fn add_one(tensor: PyTensor) -> PyResult<PyTensor> {
 }
 
 #[pyfunction]
-fn tfrecord_open(filename: &str, compressed: bool) -> PyResult<()> {
+fn tfrecord_open(filename: &str, compressed: bool) -> PyResult<HashMap<String, PyTensor>> {
     tfrecord_reader::tfrecord_reader(filename, compressed)
-        .map_err(|e| PyErr::new::<PyValueError, _>(format!("{e:?}")))?;
-    Ok(())
+        .map(|hm| hm.into_iter().map(|(k, v)| (k, PyTensor(v))).collect())
+        .map_err(|e| PyErr::new::<PyValueError, _>(format!("{e:?}")))
 }
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn rustfrecord(py: Python, m: &PyModule) -> PyResult<()> {
-    py.import("torch")?;
+fn rustfrecord(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.py().import_bound("torch")?;
     m.add_function(wrap_pyfunction!(add_one, m)?)?;
     m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
     m.add_function(wrap_pyfunction!(tfrecord_open, m)?)?;

@@ -1,10 +1,11 @@
-use std::{fs, io::Read, path::Path};
+use std::{collections::HashMap, fs, io::Read, path::Path};
 
 use anyhow::{Context, Result};
 use flate2::read::GzDecoder;
-use tfrecord::{ExampleIter, RecordReaderConfig};
+use tch::Tensor;
+use tfrecord::{ExampleIter, Feature, FeatureKind, RecordReaderConfig};
 
-pub fn tfrecord_reader(filename: &str, compressed: bool) -> Result<()> {
+pub fn tfrecord_reader(filename: &str, compressed: bool) -> Result<HashMap<String, Tensor>> {
     let path = Path::new(filename);
 
     let conf = RecordReaderConfig {
@@ -29,15 +30,23 @@ pub fn tfrecord_reader(filename: &str, compressed: bool) -> Result<()> {
     // (which is one of packed BytesList, FloatList, or Int64List).
     //
     for example in example_iter {
-        let hm = example?.into_hash_map();
-        
-        let hm = hm.into_iter().map(|(name, feature)| {
-            println!("Feature: {name}: {feature:?}");
-        }).collect();
+        let hm = example?
+            .into_iter()
+            .map(|(name, feature)| {
+                // println!("Feature: {name}"); //: {feature:?}");
+                // let tensor = Tensor::new();
+                let tensor = match feature.into_kinds() {
+                    Some(FeatureKind::F32(value)) => Tensor::from_slice(&value),
+                    Some(FeatureKind::I64(value)) => Tensor::from_slice(&value),
+                    Some(FeatureKind::Bytes(value)) => Tensor::from_slice(&value[0]), // FIXME: Don't hardcode [0]
+                    None => Tensor::new(),
+                };
+                (name, tensor)
+            })
+            .collect();
 
-        // break; // FIXME
-        return Ok(hm);
+        return Ok(hm); // FIXME
     }
 
-    Ok(())
+    unreachable!()
 }
