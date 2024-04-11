@@ -38,7 +38,7 @@ pub fn tfrecord_reader(filename: &str, compressed: bool) -> Result<HashMap<Strin
                 let tensor = match feature.into_kinds() {
                     Some(FeatureKind::F32(value)) => Tensor::from_slice(&value),
                     Some(FeatureKind::I64(value)) => Tensor::from_slice(&value),
-                    Some(FeatureKind::Bytes(value)) => Tensor::from_slice(&value[0]), // FIXME: Don't hardcode [0]
+                    Some(FeatureKind::Bytes(value)) => Tensor::from_slice2(&value),
                     None => Tensor::new(),
                 };
                 (name, tensor)
