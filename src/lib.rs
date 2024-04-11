@@ -13,19 +13,33 @@ struct Reader {
     inner: tfrecord_reader::Reader,
 }
 
-#[pyfunction]
-fn new(filename: &str, compressed: bool) -> PyResult<Reader> {
-    tfrecord_reader::Reader::new(filename, compressed)
-        .map(|r| Reader { inner: r })
-        .map_err(|e| PyErr::new::<PyOSError, _>(format!("{e:?}")))
-}
+#[pymethods]
+impl Reader {
+    #[new]
+    fn new(filename: &str, compressed: bool) -> PyResult<Self> {
+        tfrecord_reader::Reader::new(filename, compressed)
+            .map(|r| Reader { inner: r })
+            .map_err(|e| PyOSError::new_err(format!("{e:?}")))
+    }
 
-// fn next(filename: &str, compressed: bool) -> PyResult<HashMap<String, PyTensor>> {
-// .map(|hm| hm.into_iter().map(|(k, v)| (k, PyTensor(v))).collect())
+    // TODO: Implement Python iterator protocol (or maybe do that in a Python wrapper?)
+    fn next(&mut self) -> PyResult<Option<HashMap<String, PyTensor>>> {
+        let wrap_pytensor =
+            |hm: HashMap<_, _>| hm.into_iter().map(|(k, v)| (k, PyTensor(v))).collect();
+
+        self.inner
+            .next()
+            .map(|r| {
+                r.map(wrap_pytensor)
+                    .map_err(|e| PyValueError::new_err(format!("{e:?}")))
+            })
+            .transpose()
+    }
+}
 
 #[pymodule]
 fn rustfrecord(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.py().import_bound("torch")?;
-    m.add_function(wrap_pyfunction!(new, m)?)?;
+    m.add_class::<Reader>()?;
     Ok(())
 }
