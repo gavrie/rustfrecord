@@ -6,8 +6,7 @@ use tch::Tensor;
 use tfrecord::{Example, ExampleIter, Feature, FeatureKind, RecordReaderConfig};
 
 pub struct Reader {
-    // example_iter: ExampleIter<Box<dyn Read>>,
-    example_iter: ExampleIter<GzDecoder<fs::File>>,
+    example_iter: ExampleIter<Box<dyn Read + Send>>,
 }
 
 impl Reader {
@@ -20,16 +19,11 @@ impl Reader {
 
         let file = fs::File::open(path).with_context(|| format!("failed to open {path:?}"))?;
 
-        // FIXME: The Box is not Send so won't work with pyo3.
-        // We should probably use Arc instead or use statically typed (optional?) fields.
-        //
-        // let reader: Box<dyn Read> = if compressed {
-        //     Box::new(GzDecoder::new(file))
-        // } else {
-        //     Box::new(file)
-        // };
-
-        let reader = GzDecoder::new(file);
+        let reader: Box<dyn Read + Send> = if compressed {
+            Box::new(GzDecoder::new(file))
+        } else {
+            Box::new(file)
+        };
 
         let example_iter = ExampleIter::from_reader(reader, conf);
 
