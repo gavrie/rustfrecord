@@ -22,12 +22,15 @@ impl Reader {
             .map_err(|e| PyOSError::new_err(format!("{e:?}")))
     }
 
-    // TODO: Implement Python iterator protocol (or maybe do that in a Python wrapper?)
-    fn next(&mut self) -> PyResult<Option<HashMap<String, PyTensor>>> {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> PyResult<Option<HashMap<String, PyTensor>>> {
         let wrap_pytensor =
             |hm: HashMap<_, _>| hm.into_iter().map(|(k, v)| (k, PyTensor(v))).collect();
 
-        self.inner
+        slf.inner
             .next()
             .map(|r| {
                 r.map(wrap_pytensor)
