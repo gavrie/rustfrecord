@@ -1,3 +1,5 @@
 /target
 /data
 .python-version
+requirements.txt
+/rust-tfrecord

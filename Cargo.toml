@@ -23,7 +23,7 @@ features = ["extension-module"]
 
 [dependencies.tfrecord]
 # version = "0.15.0"
-path = "../../third-party/rust-tfrecord/tfrecord"
+path = "rust-tfrecord/tfrecord"
 features = ["with-serde", "with-tch"]
 
 [dependencies.flate2]
