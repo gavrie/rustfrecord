@@ -43,9 +43,7 @@ impl Iterator for Reader {
     type Item = tfrecord::Result<HashMap<String, Tensor>>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.example_iter
-            .next()
-            .map(|e| e.map(|e| example_to_hashmap(e)))
+        self.example_iter.next().map(|e| e.map(example_to_hashmap))
     }
 }
 
