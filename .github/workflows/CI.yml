@@ -23,6 +23,7 @@ env:
 jobs:
   linux:
     runs-on: ${{ matrix.platform.runner }}
+
     strategy:
       matrix:
         platform:
@@ -30,11 +31,24 @@ jobs:
             target: x86_64
           - runner: ubuntu-latest
             target: aarch64
+
+    env:
+      LIBTORCH_USE_PYTORCH: 1
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
+      - name: Install deps
+        run: |
+          pip install uv
+          uv pip compile requirements.in -o requirements.txt
+          cat requirements.txt
+          uv pip install -r requirements.txt
+
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -42,6 +56,7 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
+
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -101,13 +116,16 @@ jobs:
 
   sdist:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Build sdist
         uses: PyO3/maturin-action@v1
         with:
           command: sdist
           args: --out dist
+
       - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:
@@ -118,13 +136,16 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: "startsWith(github.ref, 'refs/tags/')"
+
     needs:
       - linux
       # - windows
       # - macos
       - sdist
+
     steps:
       - uses: actions/download-artifact@v4
+
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         with:
