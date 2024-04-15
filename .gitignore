@@ -4,5 +4,4 @@
 requirements.txt
 /rust-tfrecord
 /.venv
-/.github
 /ra_target
