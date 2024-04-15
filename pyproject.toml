@@ -11,12 +11,12 @@ classifiers = [
 ]
 
 dependencies = [
-    "setuptools==69.2.0",
+    "setuptools",   #==69.2.0",
     "torch==2.2.0",
-    "maturin==1.5.1",
-    "patchelf==0.17.2.1",
-    "pip==24.0",
-    "numpy==1.26.4",
+    "maturin",      #==1.5.1",
+    "patchelf",     #==0.17.2.1",
+    "pip",          #==24.0",
+    "numpy",        #==1.26.4",
 ]
 
 [build-system]
