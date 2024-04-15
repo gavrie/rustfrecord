@@ -44,9 +44,13 @@ jobs:
 
       - name: Install deps
         run: |
-          pip install uv
+          pip install uv && uv venv && source .venv/bin/activate
+
+          echo =============================================
           uv pip compile requirements.in -o requirements.txt
           cat requirements.txt
+          echo =============================================
+
           uv pip install -r requirements.txt
 
       - name: Build wheels
