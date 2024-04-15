@@ -4,4 +4,4 @@
 requirements.txt
 /rust-tfrecord
 /.venv
-/ra_target
+/target_maturin
