@@ -32,9 +32,6 @@ jobs:
           # - runner: ubuntu-latest
           #   target: aarch64
 
-    env:
-      LIBTORCH_USE_PYTORCH: 1
-
     steps:
       - uses: actions/checkout@v4
 
@@ -60,6 +57,7 @@ jobs:
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
+          docker-options: -e LIBTORCH_USE_PYTORCH=1 
           sccache: 'true'
           manylinux: auto
 
