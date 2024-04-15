@@ -57,11 +57,15 @@ jobs:
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
-          before-script-linux: |
-            pip install torch==2.2.0
           docker-options: -e LIBTORCH_USE_PYTORCH=1
           sccache: true
-          manylinux: 2014
+          manylinux: '2014'
+          before-script-linux: |
+            python --version
+            pip --version
+            pip list
+            pip install torch
+            pip install torch==2.2.0
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
