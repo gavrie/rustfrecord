@@ -56,11 +56,12 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python3.8
-          # --find-interpreter
-          # docker-options: -e LIBTORCH_USE_PYTORCH=1
+          args: --release --out dist --find-interpreter
+          before-script-linux: |
+            pip install torch==2.2.0
+          docker-options: -e LIBTORCH_USE_PYTORCH=1
           sccache: true
-          manylinux: auto
+          manylinux: 2014
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
