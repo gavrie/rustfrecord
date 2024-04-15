@@ -18,7 +18,7 @@ torch-sys = { version = "0.15.0", features = ["python-extension"] }
 
 [dependencies.pyo3]
 version = "0.21.1"
-features = ["extension-module"] # Add "abi3" for multiple Python version support?
+features = ["extension-module", "abi3-py38"]
 
 [dependencies.tfrecord]
 # version = "0.15.0"

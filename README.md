@@ -6,6 +6,6 @@ uv pip compile requirements.in -o requirements.txt
 uv pip install -r requirements.txt
 
 export LIBTORCH_USE_PYTORCH=1
-maturin develop
+CARGO_TARGET_DIR=target_maturin maturin develop
 
 python main.py
