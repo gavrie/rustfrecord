@@ -47,10 +47,11 @@ jobs:
           pip install uv
           uv venv
 
-          # echo =============================================
-          # uv pip compile requirements.in -o requirements.txt
-          # cat requirements.txt
-          # echo =============================================
+          echo =============================================
+          uv pip compile requirements.in -o requirements.txt
+          cat requirements.txt
+          cp requirements.txt requirements-linux.txt
+          echo =============================================
 
           uv pip install -r requirements-linux.txt
 
