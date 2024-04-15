@@ -3,3 +3,5 @@
 .python-version
 requirements.txt
 /rust-tfrecord
+/.venv
+/.github
