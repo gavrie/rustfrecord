@@ -64,8 +64,8 @@ jobs:
           before-script-linux: |
             # Install the correct version of libtorch
             # export GLIBCXX_USE_CXX11_ABI=0
+            python${{ env.PYTHON_VERSION }} -m pip install numpy torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu
             ln -sf python${{ env.PYTHON_VERSION }} /usr/local/bin/python3
-            python3 -m pip install numpy torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
