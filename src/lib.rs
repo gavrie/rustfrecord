@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
-use pyo3::exceptions::{PyOSError, PyTypeError, PyValueError};
+use pyo3::exceptions::{PyOSError, PyValueError};
 use pyo3::prelude::*;
-use pyo3_tch::{wrap_tch_err, PyTensor};
-use tch::Tensor;
+use pyo3_tch::PyTensor;
 
 mod pyo3_tch;
 mod tfrecord_reader;

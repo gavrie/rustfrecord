@@ -3,7 +3,7 @@ use std::{collections::HashMap, fs, io::Read, path::Path};
 use anyhow::{Context, Result};
 use flate2::read::GzDecoder;
 use tch::Tensor;
-use tfrecord::{Example, ExampleIter, Feature, FeatureKind, RecordReaderConfig};
+use tfrecord::{Example, ExampleIter, FeatureKind, RecordReaderConfig};
 
 pub struct Reader {
     example_iter: ExampleIter<Box<dyn Read + Send>>,

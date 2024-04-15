@@ -22,7 +22,9 @@ features = ["extension-module"] # Add "abi3" for multiple Python version support
 
 [dependencies.tfrecord]
 # version = "0.15.0"
-path = "rust-tfrecord/tfrecord"
+# path = "rust-tfrecord/tfrecord"
+git = "https://github.com/gavrie/rust-tfrecord.git"
+branch = "tch-0.15.0"
 features = ["with-serde", "with-tch"]
 
 [dependencies.flate2]
