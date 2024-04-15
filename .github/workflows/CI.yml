@@ -35,30 +35,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+      # - uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install deps
-        run: |
-          pip install uv
-          uv venv
+      # - name: Install deps
+      #   run: |
+      #     pip install uv
+      #     uv venv
 
-          echo =============================================
-          uv pip compile pyproject.toml -o requirements.txt
-          cat requirements.txt
-          cp requirements.txt requirements-linux.txt
-          echo =============================================
+      #     echo =============================================
+      #     uv pip compile pyproject.toml -o requirements.txt
+      #     cat requirements.txt
+      #     cp requirements.txt requirements-linux.txt
+      #     echo =============================================
 
-          uv pip install -r requirements-linux.txt
+      #     uv pip install -r requirements-linux.txt
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter
-          docker-options: -e LIBTORCH_USE_PYTORCH=1 
-          sccache: 'true'
+          args: --release --out dist -i python3.8
+          # --find-interpreter
+          # docker-options: -e LIBTORCH_USE_PYTORCH=1
+          sccache: true
           manylinux: auto
 
       - name: Upload wheels
