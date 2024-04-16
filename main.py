@@ -7,7 +7,7 @@ filename = "data/002scattered.training_examples.tfrecord.gz"
 r = Reader(filename, compressed=True)
 
 
-for (i, features) in enumerate(r):
+for i, features in enumerate(r):
     # print(i, features.keys())
     # ['variant_type',
     #  'image/encoded',
@@ -18,9 +18,9 @@ for (i, features) in enumerate(r):
     #  'locus',
     #  'sequencing_type']
 
-    label: Tensor = features['label']
-    shape = torch.Size(tuple(features['image/shape']))
-    image: Tensor = features['image/encoded'][0].reshape(shape)
+    label: Tensor = features["label"]
+    shape = torch.Size(tuple(features["image/shape"]))
+    image: Tensor = features["image/encoded"][0].reshape(shape)
 
     print(i, label, image.shape)
 
