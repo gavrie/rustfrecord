@@ -38,8 +38,8 @@ jobs:
         platform:
           - runner: ubuntu-latest
             target: x86_64
-          # - runner: ubuntu-latest
-          #   target: aarch64
+          - runner: ubuntu-latest
+            target: aarch64
 
     steps:
       - uses: actions/checkout@v4
@@ -70,6 +70,7 @@ jobs:
             --release
             --out dist
             --interpreter python${{ env.PYTHON_VERSION }}
+            --strip
             --skip-auditwheel
           docker-options: -e LIBTORCH_USE_PYTORCH=1
           sccache: true
