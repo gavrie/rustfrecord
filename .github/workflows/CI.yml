@@ -65,10 +65,14 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python${{ env.PYTHON_VERSION }}
+          manylinux: '2014'
+          args:
+            --release
+            --out dist
+            --interpreter python${{ env.PYTHON_VERSION }}
+            --skip-auditwheel
           docker-options: -e LIBTORCH_USE_PYTORCH=1
           sccache: true
-          manylinux: '2014'
           before-script-linux: |
             # Install the correct version of libtorch
             # export GLIBCXX_USE_CXX11_ABI=0
