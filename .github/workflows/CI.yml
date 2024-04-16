@@ -75,9 +75,10 @@ jobs:
 
             # Dependencies for building the torch-sys crate:
             python${{ env.PYTHON_VERSION }} -m pip install \
-              numpy==1.24.1 \
               torch==2.2.0 \
-              --index-url https://download.pytorch.org/whl/cpu
+            ;
+            # numpy==1.24.1 \
+            # --index-url https://download.pytorch.org/whl/cpu
 
             ln -sf python${{ env.PYTHON_VERSION }} /usr/local/bin/python3
 
