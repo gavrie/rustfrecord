@@ -11,8 +11,16 @@ on:
       - main
     tags:
       - '*'
+
   pull_request:
+
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -169,5 +177,6 @@ jobs:
           args: --non-interactive --skip-existing wheels-*/*
 
       - name: Setup tmate session
-        if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
+        # if: ${{ failure() }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
