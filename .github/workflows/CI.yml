@@ -38,8 +38,9 @@ jobs:
         platform:
           - runner: ubuntu-latest
             target: x86_64
-          - runner: ubuntu-latest
-            target: aarch64
+          # Disable aarch64 for now due to torch-sys build issues
+          # - runner: ubuntu-latest
+          #   target: aarch64
 
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +86,7 @@ jobs:
             # numpy==1.24.1 \
             # --index-url https://download.pytorch.org/whl/cpu
 
-            ln -sf python${{ env.PYTHON_VERSION }} /usr/local/bin/python3 # manylinuxx86_64
+            ln -sf python${{ env.PYTHON_VERSION }} /usr/local/bin/python3 # manylinux x86_64
             ln -sf python${{ env.PYTHON_VERSION }} /usr/bin/python3 # manylinux aarch64
 
       - name: Upload wheels
