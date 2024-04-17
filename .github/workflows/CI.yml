@@ -39,8 +39,8 @@ jobs:
           - runner: ubuntu-latest
             target: x86_64
           # Disable aarch64 for now due to torch-sys build issues
-          # - runner: ubuntu-latest
-          #   target: aarch64
+          - runner: ubuntu-latest
+            target: aarch64
 
     steps:
       - uses: actions/checkout@v4
@@ -82,6 +82,7 @@ jobs:
             # Dependencies for building the torch-sys crate:
             python${{ env.PYTHON_VERSION }} -m pip install \
               torch==2.2.0 \
+              setuptools==69.5.1 `# seems necessary for aarch64` \
             ;
             # numpy==1.24.1 \
             # --index-url https://download.pytorch.org/whl/cpu
