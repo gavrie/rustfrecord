@@ -17,13 +17,14 @@ The wheel can be installed on any Linux system with Python 3.8 or higher:
 The `Reader` class reads TFRecord files and yields `Dict[str, Tensor]` objects.
 
 ```python
+import torch
 from torch import Tensor
 from rustfrecord import Reader
 
 filename = "data/002scattered.training_examples.tfrecord.gz"
 r = Reader(filename, compressed=True)
 
-for (i, features) in enumerate(r):
+for i, features in enumerate(r):
     print(features.keys())
     # ['variant_type', 'image/encoded', 'image/shape',
     #  'variant/encoded', 'label', 'alt_allele_indices/encoded',

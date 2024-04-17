@@ -1,6 +1,6 @@
 [package]
 name = "rustfrecord"
-version = "0.1.4"
+version = "0.1.5"
 description = "Rust implementation to read TFRecord files into PyTorch tensors"
 edition = "2021"
 

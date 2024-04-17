@@ -1,4 +1,9 @@
-use std::{collections::HashMap, fs, io::Read, path::Path};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+    io::Read,
+    path::Path,
+};
 
 use anyhow::{Context, Result};
 use flate2::read::GzDecoder;
@@ -7,10 +12,11 @@ use tfrecord::{Example, ExampleIter, FeatureKind, RecordReaderConfig};
 
 pub struct Reader {
     example_iter: ExampleIter<Box<dyn Read + Send>>,
+    features: HashSet<String>,
 }
 
 impl Reader {
-    pub fn new(filename: &str, compressed: bool) -> Result<Self> {
+    pub fn new(filename: &str, compressed: bool, features: &[impl AsRef<str>]) -> Result<Self> {
         let path = Path::new(filename);
 
         let conf = RecordReaderConfig {
@@ -27,7 +33,10 @@ impl Reader {
 
         let example_iter = ExampleIter::from_reader(reader, conf);
 
-        Ok(Self { example_iter })
+        Ok(Self {
+            example_iter,
+            features: features.iter().map(|s| s.as_ref().to_string()).collect(),
+        })
     }
 }
 
@@ -43,13 +52,16 @@ impl Iterator for Reader {
     type Item = tfrecord::Result<HashMap<String, Tensor>>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.example_iter.next().map(|e| e.map(example_to_hashmap))
+        self.example_iter
+            .next()
+            .map(|e| e.map(|e| example_to_hashmap(e, &self.features)))
     }
 }
 
-fn example_to_hashmap(example: Example) -> HashMap<String, Tensor> {
+fn example_to_hashmap(example: Example, features: &HashSet<String>) -> HashMap<String, Tensor> {
     example
         .into_iter()
+        .filter(|(name, _)| features.is_empty() || features.contains(name))
         .map(|(name, feature)| {
             let tensor = match feature.into_kinds() {
                 Some(FeatureKind::F32(value)) => Tensor::from_slice(&value),

@@ -15,8 +15,9 @@ struct Reader {
 #[pymethods]
 impl Reader {
     #[new]
-    fn new(filename: &str, compressed: bool) -> PyResult<Self> {
-        tfrecord_reader::Reader::new(filename, compressed)
+    fn new(filename: &str, compressed: bool, features: Option<Vec<String>>) -> PyResult<Self> {
+        let features = features.unwrap_or_default();
+        tfrecord_reader::Reader::new(filename, compressed, &features)
             .map(|r| Reader { inner: r })
             .map_err(|e| PyOSError::new_err(format!("{e:?}")))
     }

@@ -4,33 +4,43 @@ from torch import Tensor
 
 
 class TFRecordDataset(torch.utils.data.IterableDataset):
-    def __init__(self, filename: str, compressed: bool = True):
+    def __init__(self, filename: str, compressed: bool = True, features: list = None):
         super().__init__()
         self.filename = filename
         self.compressed = compressed
+        self.features = features
 
     def __iter__(self):
-        # worker_info = torch.utils.data.get_worker_info()
-        # if worker_info is None:  # single-process data loading, return the full iterator
-        #     iter_start = self.start
-        #     iter_end = self.end
-        # else:  # in a worker process
-        #     # split workload
-        #     per_worker = int(math.ceil((self.end - self.start) / float(worker_info.num_workers)))
-        #     worker_id = worker_info.id
-        #     iter_start = self.start + worker_id * per_worker
-        #     iter_end = min(iter_start + per_worker, self.end)
-        reader = Reader(self.filename, compressed=self.compressed)
+        reader = Reader(
+            self.filename,
+            compressed=self.compressed,
+            features=self.features,
+        )
         return iter(reader)
 
 
 def test_dataset():
-    # should give same set of data as range(3, 7), i.e., [3, 4, 5, 6].
     filename = "data/002scattered.training_examples.tfrecord.gz"
-    ds = TFRecordDataset(filename, compressed=True)
+    ds = TFRecordDataset(
+        filename,
+        compressed=True,
+        features=[
+            "label",
+            "image/encoded",
+            "image/shape",
+        ],
+    )
+    print()
 
-    # Single-process loading
-    print(list(torch.utils.data.DataLoader(ds, num_workers=0)))
+    loader = torch.utils.data.DataLoader(ds, batch_size=100)
+
+    for batch in enumerate(loader):
+        print(batch)
+
+        # if i % 1000 == 0:
+        #     print(i)
+
+        # break # Exit after a single batch
 
 
 def test_reader():
@@ -58,4 +68,5 @@ def test_reader():
 
         print(i, label, image.shape)
 
-        # break
+        if i >= 3:
+            break
