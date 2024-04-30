@@ -10,6 +10,9 @@ use flate2::read::GzDecoder;
 use tch::Tensor;
 use tfrecord::{Example, ExampleIter, FeatureKind, RecordReaderConfig};
 
+#[cfg(test)]
+mod tests;
+
 pub struct Reader {
     example_iter: ExampleIter<Box<dyn Read + Send>>,
     features: HashSet<String>,
