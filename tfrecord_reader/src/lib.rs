@@ -20,7 +20,6 @@ pub enum Compression {
 
 pub struct Reader {
     example_iter: ExampleIter<Box<dyn Read + Send>>,
-    batch_size: usize,
     features: HashSet<String>,
 }
 
@@ -28,7 +27,6 @@ impl Reader {
     pub fn new(
         filename: &str,
         compression: Compression,
-        batch_size: usize,
         features: &[impl AsRef<str>],
     ) -> Result<Self> {
         let path = Path::new(filename);
@@ -49,7 +47,6 @@ impl Reader {
 
         Ok(Self {
             example_iter,
-            batch_size,
             features,
         })
     }
