@@ -5,7 +5,6 @@ use pyo3::prelude::*;
 use pyo3_tch::PyTensor;
 
 mod pyo3_tch;
-use tfrecord_reader;
 
 #[pyclass]
 struct Reader {

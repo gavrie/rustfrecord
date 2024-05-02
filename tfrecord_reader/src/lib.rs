@@ -13,13 +13,22 @@ use tfrecord::{Example, ExampleIter, FeatureKind, RecordReaderConfig};
 #[cfg(test)]
 mod tests;
 
+pub enum Compression {
+    None,
+    Gzip,
+}
+
 pub struct Reader {
     example_iter: ExampleIter<Box<dyn Read + Send>>,
     features: HashSet<String>,
 }
 
 impl Reader {
-    pub fn new(filename: &str, compressed: bool, features: &[impl AsRef<str>]) -> Result<Self> {
+    pub fn new(
+        filename: &str,
+        compression: Compression,
+        features: &[impl AsRef<str>],
+    ) -> Result<Self> {
         let path = Path::new(filename);
 
         let conf = RecordReaderConfig {
@@ -28,17 +37,17 @@ impl Reader {
 
         let file = fs::File::open(path).with_context(|| format!("failed to open {path:?}"))?;
 
-        let reader: Box<dyn Read + Send> = if compressed {
-            Box::new(GzDecoder::new(file))
-        } else {
-            Box::new(file)
+        let reader: Box<dyn Read + Send> = match compression {
+            Compression::Gzip => Box::new(GzDecoder::new(file)),
+            Compression::None => Box::new(file),
         };
 
         let example_iter = ExampleIter::from_reader(reader, conf);
+        let features = features.iter().map(|s| s.as_ref().to_string()).collect();
 
         Ok(Self {
             example_iter,
-            features: features.iter().map(|s| s.as_ref().to_string()).collect(),
+            features,
         })
     }
 }
