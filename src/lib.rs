@@ -16,7 +16,13 @@ impl Reader {
     #[new]
     fn new(filename: &str, compressed: bool, features: Option<Vec<String>>) -> PyResult<Self> {
         let features = features.unwrap_or_default();
-        tfrecord_reader::Reader::new(filename, compressed, &features)
+
+        let compression = match compressed {
+            true => tfrecord_reader::Compression::Gzip,
+            false => tfrecord_reader::Compression::None,
+        };
+
+        tfrecord_reader::Reader::new(filename, compression, &features)
             .map(|r| Reader { inner: r })
             .map_err(|e| PyOSError::new_err(format!("{e:?}")))
     }

@@ -35,6 +35,12 @@ impl Reader {
             check_integrity: false,
         };
 
+        eprintln!(
+            "threads: {}, interop: {}",
+            tch::get_num_threads(),
+            tch::get_num_interop_threads()
+        );
+
         let file = fs::File::open(path).with_context(|| format!("failed to open {path:?}"))?;
 
         let reader: Box<dyn Read + Send> = match compression {
