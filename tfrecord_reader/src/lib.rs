@@ -7,7 +7,6 @@ use std::{
 
 use anyhow::{Context, Result};
 use flate2::read::GzDecoder;
-use tch::Tensor;
 use tfrecord::{Example, ExampleIter, FeatureKind, RecordReaderConfig};
 
 #[cfg(test)]
@@ -16,6 +15,13 @@ mod tests;
 pub enum Compression {
     None,
     Gzip,
+}
+
+pub enum Array {
+    Bytes(Vec<Vec<u8>>),
+    F32(Vec<f32>),
+    I64(Vec<i64>),
+    None,
 }
 
 pub struct Reader {
@@ -34,12 +40,6 @@ impl Reader {
         let conf = RecordReaderConfig {
             check_integrity: false,
         };
-
-        eprintln!(
-            "threads: {}, interop: {}",
-            tch::get_num_threads(),
-            tch::get_num_interop_threads()
-        );
 
         let file = fs::File::open(path).with_context(|| format!("failed to open {path:?}"))?;
 
@@ -67,7 +67,7 @@ impl Iterator for Reader {
     // It contains a key-value store (features); where each key (string) maps to a Feature message
     // (which is one of packed BytesList, FloatList, or Int64List).
 
-    type Item = tfrecord::Result<HashMap<String, Tensor>>;
+    type Item = tfrecord::Result<HashMap<String, Array>>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.example_iter
@@ -76,18 +76,18 @@ impl Iterator for Reader {
     }
 }
 
-fn example_to_hashmap(example: Example, features: &HashSet<String>) -> HashMap<String, Tensor> {
+fn example_to_hashmap(example: Example, features: &HashSet<String>) -> HashMap<String, Array> {
     example
         .into_iter()
         .filter(|(name, _)| features.is_empty() || features.contains(name))
         .map(|(name, feature)| {
-            let tensor = match feature.into_kinds() {
-                Some(FeatureKind::F32(value)) => Tensor::from_slice(&value),
-                Some(FeatureKind::I64(value)) => Tensor::from_slice(&value),
-                Some(FeatureKind::Bytes(value)) => Tensor::from_slice2(&value),
-                None => Tensor::new(),
+            let array = match feature.into_kinds() {
+                Some(FeatureKind::F32(value)) => Array::F32(value),
+                Some(FeatureKind::I64(value)) => Array::I64(value),
+                Some(FeatureKind::Bytes(value)) => Array::Bytes(value),
+                None => Array::None,
             };
-            (name, tensor)
+            (name, array)
         })
         .collect()
 }

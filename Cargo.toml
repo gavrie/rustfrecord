@@ -15,9 +15,8 @@ debug = true
 
 [dependencies]
 anyhow = { version = "1.0.81", features = ["backtrace"] }
-tch = { version = "0.15.0", features = ["python-extension"] }
-torch-sys = { version = "0.15.0", features = ["python-extension"] }
 tfrecord_reader = { path = "tfrecord_reader" }
+numpy = "0.21.0"
 
 [dependencies.pyo3]
 version = "0.21.1"

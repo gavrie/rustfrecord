@@ -2,9 +2,8 @@ use std::collections::HashMap;
 
 use pyo3::exceptions::{PyOSError, PyValueError};
 use pyo3::prelude::*;
-use pyo3_tch::PyTensor;
 
-mod pyo3_tch;
+use numpy::{pyarray, pyarray_bound, IntoPyArray};
 
 #[pyclass]
 struct Reader {
@@ -31,9 +30,25 @@ impl Reader {
         slf
     }
 
-    fn __next__(mut slf: PyRefMut<'_, Self>) -> PyResult<Option<HashMap<String, PyTensor>>> {
-        let wrap_pytensor =
-            |hm: HashMap<_, _>| hm.into_iter().map(|(k, v)| (k, PyTensor(v))).collect();
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> PyResult<Option<HashMap<String, PyObject>>> {
+        let py = slf.py();
+
+        let wrap_pytensor = |hm: HashMap<_, _>| {
+            hm.into_iter()
+                .map(|(k, v)| {
+                    use tfrecord_reader::Array;
+
+                    let value = match v {
+                        Array::Bytes(mut v) => v.pop().unwrap().into_pyarray_bound(py).into_py(py),
+                        Array::F32(v) => v.into_pyarray_bound(py).into_py(py),
+                        Array::I64(v) => v.into_pyarray_bound(py).into_py(py),
+                        Array::None => pyarray_bound![py, [0]].into_py(py),
+                    };
+
+                    (k, value)
+                })
+                .collect()
+        };
 
         slf.inner
             .next()

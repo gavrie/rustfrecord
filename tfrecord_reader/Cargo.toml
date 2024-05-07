@@ -7,15 +7,12 @@ edition = "2021"
 
 [dependencies]
 anyhow = { version = "1.0.81", features = ["backtrace"] }
-tch = { version = "0.15.0", features = ["python-extension"] }
-torch-sys = { version = "0.15.0", features = ["python-extension"] }
 
 [dependencies.tfrecord]
 # version = "0.15.0"
 # path = "rust-tfrecord/tfrecord"
 git = "https://github.com/gavrie/rust-tfrecord.git"
 branch = "tch-0.15.0"
-features = ["with-serde", "with-tch"]
 
 [dependencies.flate2]
 version = "1.0.28"
