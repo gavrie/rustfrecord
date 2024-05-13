@@ -3,10 +3,11 @@ use std::collections::HashMap;
 use pyo3::exceptions::{PyOSError, PyValueError};
 use pyo3::prelude::*;
 
-use numpy::{pyarray, pyarray_bound, IntoPyArray};
+use numpy::{pyarray_bound, IntoPyArray};
 
 #[pyclass]
 struct Reader {
+    filename: String,
     inner: tfrecord_reader::Reader,
 }
 
@@ -22,8 +23,11 @@ impl Reader {
         };
 
         tfrecord_reader::Reader::new(filename, compression, &features)
-            .map(|r| Reader { inner: r })
-            .map_err(|e| PyOSError::new_err(format!("{e:?}")))
+            .map(|r| Reader {
+                filename: filename.to_owned(),
+                inner: r,
+            })
+            .map_err(|e| PyOSError::new_err(format!("{filename}: {e:?}")))
     }
 
     fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
@@ -53,8 +57,16 @@ impl Reader {
         slf.inner
             .next()
             .map(|r| {
-                r.map(wrap_pytensor)
-                    .map_err(|e| PyValueError::new_err(format!("{e:?}")))
+                r.map(wrap_pytensor).map_err(|e| {
+                    use tfrecord_reader::Error;
+                    let filename = &slf.filename;
+                    match e {
+                        Error::IoError(_) | Error::UnexpectedEof => {
+                            PyOSError::new_err(format!("{filename}: {e:?}"))
+                        }
+                        _ => PyValueError::new_err(format!("{filename}: {e:?}")),
+                    }
+                })
             })
             .transpose()
     }

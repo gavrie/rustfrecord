@@ -8,6 +8,7 @@ use std::{
 use anyhow::{Context, Result};
 use flate2::read::GzDecoder;
 use tfrecord::{Example, ExampleIter, FeatureKind, RecordReaderConfig};
+pub use tfrecord::Error;
 
 #[cfg(test)]
 mod tests;
