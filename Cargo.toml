@@ -1,7 +1,7 @@
 workspace = { members = ["tfrecord_reader"] }
 [package]
 name = "rustfrecord"
-version = "0.1.6"
+version = "0.1.7"
 description = "Rust implementation to read TFRecord files into PyTorch tensors"
 edition = "2021"
 
