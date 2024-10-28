@@ -39,6 +39,8 @@ for i, features in enumerate(r):
 
 ## Development
 
+Repo: https://github.com/gavrie/rustfrecord
+
 To develop this package (not just use it), you need to install the Rust compiler and the Python development headers.
 
     pip install uv
