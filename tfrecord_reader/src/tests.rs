@@ -30,19 +30,25 @@ fn test_read() -> Result<()> {
         let [label] = label.as_slice() else {
             return Err(anyhow!("Expected 'label' to have exactly 1 element"));
         };
-        let label = str::from_utf8(label.as_slice())?;
 
         let [width, height, depth] = shape[..] else {
             return Err(anyhow!("Expected 'image/shape' to have exactly 3 elements"));
         };
 
         let [encoded] = encoded.as_slice() else {
-            return Err(anyhow!("Expected 'image/encoded' to have exactly 1 element"));
+            return Err(anyhow!(
+                "Expected 'image/encoded' to have exactly 1 element"
+            ));
         };
+
+        // Convert the values to the expected types
+        let label = str::from_utf8(label.as_slice())?;
+        let shape = (width, height, depth);
+        let encoded = encoded.as_slice();
 
         // Finally, print the values
         eprintln!("Label: {label}");
-        eprintln!("Shape: {width}x{height}x{depth}");
+        eprintln!("Shape: {shape:?}");
         eprintln!("Encoded: {} bytes", encoded.len());
         eprintln!();
     }
