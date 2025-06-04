@@ -5,3 +5,4 @@ requirements.txt
 /rust-tfrecord
 /.venv
 /target_maturin
+__pycache__/

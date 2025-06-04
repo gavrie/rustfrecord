@@ -1,0 +1,11 @@
+[project]
+name = "tf-example"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "tensorflow>=2.13.1",
+    "pillow>=9.0.0",
+    "numpy>=1.21.0",
+]
