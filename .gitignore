@@ -6,3 +6,4 @@ requirements.txt
 /.venv
 /target_maturin
 __pycache__/
+.DS_Store

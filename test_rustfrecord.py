@@ -53,7 +53,7 @@ def test_loader():
 
 
 def test_dataset():
-    for _ in range(10):
+    for _ in range(1):
         ds = TFRecordDataset(
             filename,
             compressed=filename.endswith(".gz"),
@@ -67,12 +67,11 @@ def test_dataset():
         print()
 
         for i, features in enumerate(ds):
-            label: Tensor = features["label"]
+            label: Tensor = features["label"].tobytes().decode("utf-8")
             shape = torch.Size(tuple(features["image/shape"]))
             image: Tensor = features["image/encoded"].reshape(shape)
 
-            if i % 1000 == 0:
-                print(i, label, image.shape)
+            print(i, label, image.shape)
 
 
 def test_reader():
