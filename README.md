@@ -12,7 +12,7 @@ The wheel can be installed on any Linux system with Python 3.8 or higher:
 
 ```bash
 pip3 install rustfrecord
-````
+```
 
 ## Getting Started
 
