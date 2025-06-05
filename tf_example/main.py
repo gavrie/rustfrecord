@@ -88,9 +88,7 @@ def generate_funny_animal_names(count: int) -> list:
     try:
         client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
         
-        prompt = f"""Generate {count} funny, creative animal names in the style of Ubuntu version names (adjective_animal format).
-Make them humorous and imaginative but family-friendly. Examples: "giggling_giraffe", "dancing_dolphin", "sneezing_sloth".
-Return only the names, one per line, with underscores between words, no numbering or extra text."""
+        prompt = f"""Generate {count} funny, creative animal names in the style of Ubuntu version names (adjective_animal format).  Make them humorous and imaginative but family-friendly. Examples: "giggling_giraffe", "dancing_dolphin", "sneezing_sloth".  Return only the names, one per line, with underscores between words, no numbering or extra text."""
         
         response = client.chat.completions.create(
             model="gpt-4.1",
