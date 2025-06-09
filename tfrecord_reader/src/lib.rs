@@ -7,8 +7,8 @@ use std::{
 
 use anyhow::{Context, Result};
 use flate2::read::GzDecoder;
-use tfrecord::{Example, ExampleIter, FeatureKind, RecordReaderConfig};
 pub use tfrecord::Error;
+use tfrecord::{Example, ExampleIter, FeatureKind, RecordReaderConfig};
 
 #[cfg(test)]
 mod tests;
@@ -18,6 +18,7 @@ pub enum Compression {
     Gzip,
 }
 
+#[derive(Debug)]
 pub enum Array {
     Bytes(Vec<Vec<u8>>),
     F32(Vec<f32>),

@@ -10,7 +10,9 @@ Examples are loaded into native PyTorch `Tensor`s.
 
 The wheel can be installed on any Linux system with Python 3.8 or higher:
 
-    pip3 install rustfrecord
+```bash
+pip3 install rustfrecord
+````
 
 ## Getting Started
 
@@ -43,14 +45,11 @@ Repo: https://github.com/gavrie/rustfrecord
 
 To develop this package (not just use it), you need to install the Rust compiler and the Python development headers.
 
-    pip install uv
-    uv venv
-    source .venv/bin/activate
+```python
+pip install uv  # if needed
 
-    uv pip compile pyproject.toml -o requirements.txt
-    uv pip install -r requirements.txt
+export LIBTORCH_USE_PYTORCH=1
+CARGO_TARGET_DIR=target_maturin maturin develop
 
-    export LIBTORCH_USE_PYTORCH=1
-    CARGO_TARGET_DIR=target_maturin maturin develop
-
-    python main.py
+uv run pytest -sv test_rustfrecord.py
+```
