@@ -114,3 +114,10 @@ gavrie@rustybits.io
 - `pip install rustfrecord` 
 - [`test_rustfrecord.py`](test_rustfrecord.py)
 - [`src/lib.rs`](src/lib.rs)
+
+---
+
+# Getting the Code
+
+https://pypi.org/project/rustfrecord/
+https://github.com/gavrie/rustfrecord
